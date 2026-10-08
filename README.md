@@ -10,7 +10,7 @@ English | [Русский](README_RU.md)
 
 **Business question → SQL analysis → results → insights**
 
-**Project status:** Five analytical queries are available. The repository contains no source CSVs or saved query results, so numerical findings and charts are pending verification. A SQL review found two blocking query errors; proposed fixes and reproduction instructions are included below.
+**Project status:** Five analytical SQL queries are present, and the two identified SQL errors have been corrected. The queries are ready to run against the defined PostgreSQL schema; execution against the source dataset has not been verified. Source CSVs are not stored in the repository, so numerical results and charts have not yet been published.
 
 ## 📊 Overview
 
@@ -43,7 +43,6 @@ The schema defines primary and foreign keys, including a composite primary key o
 
 - **SQL / PostgreSQL** — schema definition, relational joins, filtering and aggregation.
 - **GitHub** — repository organization and bilingual project documentation.
-- **Python standard library + `psql`** — added helper for exporting results after explicit, documented query corrections.
 
 The analytical SQL demonstrates `LEFT JOIN`, `INNER JOIN`, CTEs, `GROUP BY`, `HAVING`, `COUNT`, `COUNT(DISTINCT ...)`, `AVG`, `ROUND`, `DISTINCT`, `LIKE`, `IS NOT NULL`, `ORDER BY` and `LIMIT`. No window functions, `CASE` or `UNION` are used.
 
@@ -61,15 +60,12 @@ course/
 │   ├── 1_create_database.sql
 │   ├── 2_create_tables.sql
 │   └── 3_modify_tables.sql
-├── scripts/
-│   └── export_results.py
+├── .gitignore
 ├── README.md
-├── README_RU.md
-├── SQL_REVIEW.md
-└── REPRODUCE.md
+└── README_RU.md
 ```
 
-`project_sql/` contains the five original analyses. `sql_load/` creates the database and tables, then imports four CSVs; despite its name, `3_modify_tables.sql` is a data-loading script. The original SQL files are preserved. [SQL review](SQL_REVIEW.md) documents issues and minimal fixes; [reproduction guide](REPRODUCE.md) explains loading and exporting data. An `assets/` directory can be added once actual results support charts.
+`project_sql/` contains the five analytical queries. `sql_load/` creates the database and tables, then imports four CSVs; despite its name, `3_modify_tables.sql` is a data-loading script. Its file paths must be adjusted to the local dataset location. An `assets/` directory can be added once actual results support charts.
 
 ## 🔎 Analysis
 
@@ -81,7 +77,7 @@ course/
 
 **SQL Techniques:** `LEFT JOIN`, Boolean filtering, `LIKE`, `IS NOT NULL`, `ROUND`, `ORDER BY`, `LIMIT`.
 
-**SQL Example — proposed correction to the original filter:**
+**SQL Example — location and salary filters:**
 
 ```sql
 WHERE job_title_short = 'Data Analyst'
@@ -93,9 +89,9 @@ LIMIT 10;
 
 [View full query](project_sql/1_top_paying_jobs.sql)
 
-**Result:** Not available. The original `AND / OR` precedence permits unrelated Moscow roles and `Anywhere` postings with null salaries. PostgreSQL puts nulls first in descending order by default, so these can occupy the top ten. Correct the filter before exporting results.
+**Result:** Not published because the source CSVs and saved query outputs are absent. The location alternatives are grouped in parentheses, so the role and non-null salary filters apply to both locations.
 
-**Insight:** No salary ranking can be claimed yet. After correction, the output describes individual postings in a specific location subset; it does not establish typical pay or junior-level pay.
+**Insight:** No salary ranking can be claimed yet. The query is designed to describe individual postings in a specific location subset; it does not establish typical pay or junior-level pay.
 
 ### 2. Skills in Top-Paying Jobs
 
@@ -105,7 +101,7 @@ LIMIT 10;
 
 **SQL Techniques:** CTE, `LEFT JOIN`, `INNER JOIN`, filtering, `ROUND`, `ORDER BY`, `LIMIT`.
 
-**SQL Example — proposed correction to the CTE salary output:**
+**SQL Example — CTE salary output and skill joins:**
 
 ```sql
 -- Within top_paying_jobs:
@@ -125,7 +121,7 @@ ORDER BY salary_year_avg DESC;
 
 [View full query](project_sql/2_top_paying_job_skills.sql)
 
-**Result:** Not available. The original CTE exposes the unaliased expression as `round`, so the outer `ORDER BY salary_year_avg` cannot resolve its column. The alias enables execution; qualifying the CTE sort column preserves ranking by the original, unrounded salary.
+**Result:** Not published because query outputs are absent. The CTE now exposes `ROUND(salary_year_avg) AS salary_year_avg` for the outer sort. Inside the CTE, `job_postings_fact.salary_year_avg DESC` preserves selection by the original, unrounded salary.
 
 **Insight:** Once executed, the query can identify listed skills in a small high-pay subset. It does not count or rank those skills. Postings without skill mappings disappear after the joins, and the output may contain more than ten rows.
 
@@ -217,7 +213,7 @@ Charts are pending real query outputs. No placeholder salaries, skill counts or 
 | `assets/paying_skills.png` | Query 4 | Average salary bars by skill |
 | `assets/optimal_skills.png` | Query 5 | Demand vs. mean salary scatter with skill labels |
 
-These are future paths, not links to existing files. [Export instructions](REPRODUCE.md) provide the prerequisite CSV results; Python, pandas and matplotlib are possible next steps for plotting them.
+These are future paths, not links to existing files. Real query outputs are required before plotting; Python, pandas and matplotlib are possible future tools, not implemented project components.
 
 ## 📈 Key Insights
 
@@ -248,7 +244,7 @@ Through this project, I strengthened my ability to translate analytical question
 
 Possible next steps:
 
-- Apply the documented query fixes and record the dataset source, snapshot period and salary units.
+- Record the dataset source, snapshot period and salary units.
 - Export real results, add findings and build shared pandas/matplotlib charts.
 - Check skill-name uniqueness, salary missingness, duplicate postings and tied rankings.
 - Standardize comparison populations and add seniority, geography and posting-period breakdowns.

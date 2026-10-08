@@ -6,7 +6,7 @@ WITH top_paying_jobs AS (
         job_id,
         company_dim.name,
         job_title,
-        ROUND(salary_year_avg)
+        ROUND(salary_year_avg) AS salary_year_avg
     FROM
         job_postings_fact
     LEFT JOIN company_dim ON job_postings_fact.company_id = company_dim.company_id
@@ -16,7 +16,7 @@ WITH top_paying_jobs AS (
         job_location LIKE '%Moscow%') AND
         salary_year_avg IS NOT NULL
     ORDER BY
-        salary_year_avg DESC
+        job_postings_fact.salary_year_avg DESC
     LIMIT 10
 )
 
